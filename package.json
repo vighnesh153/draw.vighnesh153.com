@@ -24,21 +24,18 @@
     "prepare": "husky install"
   },
   "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint",
+      "prettier"
+    ],
     "extends": [
       "react-app",
       "react-app/jest",
+      "plugin:@typescript-eslint/recommended",
       "prettier"
     ],
-    "overrides": [
-      {
-        "files": [
-          "**/*.ts?(x)"
-        ],
-        "rules": {
-          "prettier/prettier": "error"
-        }
-      }
-    ]
+    "rules": {}
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
@@ -58,6 +55,9 @@
     ]
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.13.0",
+    "@typescript-eslint/parser": "^5.13.0",
+    "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "husky": "^6.0.0",
     "lint-staged": "^12.3.5",
