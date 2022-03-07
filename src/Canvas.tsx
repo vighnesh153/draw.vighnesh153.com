@@ -59,7 +59,11 @@ export function Canvas(): JSX.Element {
 
   useEffect(() => {
     canvasHelperRef.current = new CanvasHelper(canvasRef.current!);
-    canvasHelperRef.current?.drawLine(0, 0, 1792, 990, 10, "green");
+    canvasHelperRef.current!.drawLine(0, 0, 1792, 990, 25, "red");
+    canvasHelperRef.current!.drawLine(0, 100, 1792, 990, 20, "green");
+    canvasHelperRef.current!.drawLine(0, 200, 1792, 990, 15, "blue");
+    canvasHelperRef.current!.drawLine(0, 300, 1792, 990, 10, "yellow");
+    canvasHelperRef.current!.drawLine(0, 400, 1792, 990, 5, "pink");
   }, []);
 
   return (
