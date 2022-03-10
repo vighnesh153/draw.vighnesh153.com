@@ -116,7 +116,7 @@ export const useEventsManager = () => {
    *
    * @param color
    */
-  const onClear = (color: string) => {
+  const onClear = (color: Color) => {
     const event: ScreenClearEvent = {
       eventId: createEventId(),
       type: "screen-clear",

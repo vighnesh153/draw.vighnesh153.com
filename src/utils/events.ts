@@ -5,7 +5,10 @@ export type Coordinates = {
   y: number;
 };
 
-export type Color = React.CSSProperties["color"];
+export enum Color {
+  Black = "black",
+  White = "white",
+}
 export enum BrushThickness {
   xs = 5,
   sm = 10,
