@@ -14,32 +14,40 @@ export enum BrushThickness {
   xl = 25,
 }
 
+export type ClickDrawEvent = {
+  eventId: string;
+  type: "click";
+  mode: "draw";
+  coordinates: Coordinates;
+  color: Color;
+  brushThickness: BrushThickness;
+};
+
+export type ClickFillEvent = {
+  eventId: string;
+  type: "click";
+  mode: "fill";
+  coordinates: Coordinates; // Where the fill should begin
+  color: Color;
+};
+
+export type DragDrawEvent = {
+  eventId: string;
+  type: "drag";
+  mode: "draw";
+  allCoordinates: Coordinates[];
+  color: Color;
+  brushThickness: BrushThickness;
+};
+
+export type ScreenClearEvent = {
+  eventId: string;
+  type: "screen-clear";
+  color: Color;
+};
+
 export type DrawEvents =
-  | {
-      eventId: string;
-      type: "click";
-      mode: "draw";
-      coordinates: Coordinates;
-      color: Color;
-      brushThickness: BrushThickness;
-    }
-  | {
-      eventId: string;
-      type: "click";
-      mode: "fill";
-      coordinates: Coordinates; // Where the fill should begin
-      color: Color;
-    }
-  | {
-      eventId: string;
-      type: "drag";
-      mode: "draw";
-      allCoordinates: Coordinates[];
-      color: Color;
-      brushThickness: BrushThickness;
-    }
-  | {
-      eventId: string;
-      type: "clear";
-      color: Color;
-    };
+  | ClickDrawEvent
+  | ClickFillEvent
+  | DragDrawEvent
+  | ScreenClearEvent;
