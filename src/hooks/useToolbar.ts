@@ -21,6 +21,14 @@ export const useToolbar = () => {
     color: Color.Black,
   });
 
+  const updateMode = (mode: EventModes) => {
+    setState({ mode });
+  };
+
+  const updateColor = (color: Color) => {
+    setState({ color });
+  };
+
   const updateBrushThickness = (brushThickness: BrushThickness) => {
     setState({
       mode: EventModes.Draw,
@@ -28,13 +36,5 @@ export const useToolbar = () => {
     });
   };
 
-  const updateColor = (color: Color) => {
-    setState({ color });
-  };
-
-  const updateMode = (mode: EventModes) => {
-    setState({ mode });
-  };
-
-  return { mode, brushThickness, color };
+  return { mode, brushThickness, color, updateMode, updateColor, updateBrushThickness };
 };
