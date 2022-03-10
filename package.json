@@ -24,6 +24,9 @@
     "eject": "react-scripts eject",
     "prepare": "husky install"
   },
+  "prettier": {
+    "printWidth": 120
+  },
   "eslintConfig": {
     "parser": "@typescript-eslint/parser",
     "plugins": [
