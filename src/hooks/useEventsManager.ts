@@ -10,6 +10,7 @@ import {
   Coordinates,
   DragDrawEvent,
   DrawEvents,
+  EventModes,
   ScreenClearEvent,
 } from "../utils/events";
 import { useCanvasHistory } from "./useCanvasHistory";
@@ -55,7 +56,7 @@ export const useEventsManager = () => {
   const onClickDraw = (options: OnClickDrawOptions) => {
     const event: ClickDrawEvent = {
       type: "click",
-      mode: "draw",
+      mode: EventModes.Draw,
       eventId: createEventId(),
       ...options,
     };
@@ -70,7 +71,7 @@ export const useEventsManager = () => {
   const onClickFill = (options: OnClickFillOptions) => {
     const event: ClickFillEvent = {
       type: "click",
-      mode: "fill",
+      mode: EventModes.Fill,
       eventId: createEventId(),
       ...options,
     };
@@ -86,7 +87,7 @@ export const useEventsManager = () => {
   const onDragDraw = (options: OnDragDrawOptions, eventId = createEventId()) => {
     const event: DragDrawEvent = {
       type: "drag",
-      mode: "draw",
+      mode: EventModes.Draw,
       eventId,
       ...options,
     };
