@@ -2,8 +2,6 @@
  * @author Vighnesh Raut <rvighnes@amazon.com>
  */
 
-import { useRef } from "react";
-
 import {
   BrushThickness,
   ClickDrawEvent,
@@ -14,6 +12,8 @@ import {
   DrawEvents,
   ScreenClearEvent,
 } from "../utils/events";
+import { useCanvasHistory } from "./useCanvasHistory";
+import { useEffect, useState } from "react";
 
 const createEventId = (): string => {
   return Math.random().toString();
@@ -37,7 +37,15 @@ export interface OnDragDrawOptions {
 }
 
 export const useEventsManager = () => {
-  const eventsRef = useRef<DrawEvents[]>([]);
+  const { eventsPointer, events, addNewEvent, replaceEvent, ...canvasHistoryOthers } = useCanvasHistory();
+  const [activeEvent, setActiveEvent] = useState<DrawEvents | null>(null);
+
+  // Updates the current active event (which needs to be processed)
+  useEffect(() => {
+    if (eventsPointer === null) return;
+    if (events.length === 0) return;
+    setActiveEvent({ ...events[eventsPointer] });
+  }, [events, eventsPointer]);
 
   /**
    * Draw the point where the user clicked
@@ -51,7 +59,7 @@ export const useEventsManager = () => {
       eventId: createEventId(),
       ...options,
     };
-    eventsRef.current.push(event);
+    addNewEvent(event);
   };
 
   /**
@@ -66,7 +74,7 @@ export const useEventsManager = () => {
       eventId: createEventId(),
       ...options,
     };
-    eventsRef.current.push(event);
+    addNewEvent(event);
   };
 
   /**
@@ -75,10 +83,7 @@ export const useEventsManager = () => {
    * @param options
    * @param eventId
    */
-  const onDragDraw = (
-    options: OnDragDrawOptions,
-    eventId = createEventId()
-  ) => {
+  const onDragDraw = (options: OnDragDrawOptions, eventId = createEventId()) => {
     const event: DragDrawEvent = {
       type: "drag",
       mode: "draw",
@@ -87,22 +92,22 @@ export const useEventsManager = () => {
     };
 
     // If this is the first event, push it directly to the list
-    if (eventsRef.current.length === 0) {
-      eventsRef.current.push(event);
+    if (eventsPointer === null) {
+      addNewEvent(event);
       return;
     }
 
-    const previousEventIndex = eventsRef.current.length - 1;
-    const previousEvent = eventsRef.current[previousEventIndex];
+    const previousEventIndex = eventsPointer;
+    const previousEvent = events[previousEventIndex];
 
     // if previousEventId == currentEventId, replace it
     if (previousEvent.eventId === eventId) {
-      eventsRef.current[previousEventIndex] = event;
+      replaceEvent(previousEventIndex, event);
       return;
     }
 
     // Else, if new event, push it directly
-    eventsRef.current.push(event);
+    addNewEvent(event);
   };
 
   /**
@@ -116,13 +121,15 @@ export const useEventsManager = () => {
       type: "screen-clear",
       color,
     };
-    eventsRef.current.push(event);
+    addNewEvent(event);
   };
 
   return {
+    activeEvent,
     onClickDraw,
     onClickFill,
     onDragDraw,
     onClear,
+    ...canvasHistoryOthers,
   };
 };

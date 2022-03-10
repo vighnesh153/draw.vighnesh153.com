@@ -2,12 +2,23 @@
  * @author Vighnesh Raut <rvighnes@amazon.com>
  */
 
-import { useState } from "react";
+import { useReducer, useState } from "react";
 import { DrawEvents } from "../utils/events";
 
+export interface CanvasHistoryState {
+  events: DrawEvents[];
+  eventsPointer: number | null;
+}
+
+const reducer = (state: CanvasHistoryState, updates: Partial<CanvasHistoryState>): CanvasHistoryState => {
+  return { ...state, ...updates };
+};
+
 export const useCanvasHistory = () => {
-  const [eventsPointer, setEventsPointer] = useState<number | null>(null);
-  const [events, setEvents] = useState<DrawEvents[]>([]);
+  const [{ events, eventsPointer }, setState] = useReducer(reducer, {
+    events: [],
+    eventsPointer: null,
+  });
 
   // Hos no history
   const isUndoAvailable = () => (eventsPointer ?? 0) > 0;
@@ -18,16 +29,33 @@ export const useCanvasHistory = () => {
   // Undo changes
   const undo = () => {
     if (isUndoAvailable()) {
-      setEventsPointer((p) => p! - 1);
+      setState({ eventsPointer: eventsPointer! - 1 });
     }
   };
 
   // Redo changes
   const redo = () => {
     if (isRedoAvailable()) {
-      setEventsPointer((p) => p! + 1);
+      setState({ eventsPointer: eventsPointer! + 1 });
     }
   };
 
-  return { eventsPointer, events, setEvents, isUndoAvailable, isRedoAvailable, undo, redo };
+  // Adds new event and deletes all the future events
+  const addNewEvent = (event: DrawEvents) => {
+    // First event
+    if (eventsPointer === null) {
+      setState({ eventsPointer: 0, events: [event] });
+      return;
+    }
+
+    const previousEvents = events.slice(0, (eventsPointer ?? 0) + 1);
+    setState({ eventsPointer: eventsPointer! + 1, events: [...previousEvents, event] });
+  };
+
+  const replaceEvent = (index: number, event: DrawEvents) => {
+    const newEvents = events.slice().splice(index, 1, event);
+    setState({ events: newEvents });
+  };
+
+  return { eventsPointer, events, addNewEvent, replaceEvent, isUndoAvailable, isRedoAvailable, undo, redo };
 };
