@@ -2,22 +2,15 @@
  * @author Vighnesh Raut <rvighnes@amazon.com>
  */
 
-import React, {
-  MouseEventHandler,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { CanvasHelper } from "./CanvasHelper";
-import { debounce } from "@vighnesh153/utils";
+import React, { MouseEventHandler, useCallback, useEffect, useRef } from 'react';
+import { CanvasHelper } from './CanvasHelper';
 
-type State = "idle" | "mousedown" | "drag";
+type State = 'idle' | 'mousedown' | 'drag';
 type Coordinate = { x: number; y: number };
 
 export function Canvas(): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const stateRef = useRef<State>("idle");
+  const stateRef = useRef<State>('idle');
   const isMouseDownRef = useRef<boolean>(false);
   const canvasHelperRef = useRef<CanvasHelper>();
   const coordinates = useRef<Coordinate[]>([]);
@@ -32,18 +25,18 @@ export function Canvas(): JSX.Element {
 
     console.log(coordinates.length);
 
-    canvasHelperRef.current!.drawLine(c1.x, c1.y, c2.x, c2.y, 3, "red");
+    canvasHelperRef.current!.drawLine(c1.x, c1.y, c2.x, c2.y, 3, 'red');
   }, []);
 
   const onMouseDown: MouseEventHandler<HTMLCanvasElement> = (e) => {
     isMouseDownRef.current = true;
-    stateRef.current = "mousedown";
+    stateRef.current = 'mousedown';
   };
 
   const onMouseMove: MouseEventHandler<HTMLCanvasElement> = (e) => {
-    if (!["mousedown", "drag"].includes(stateRef.current)) return;
+    if (!['mousedown', 'drag'].includes(stateRef.current)) return;
 
-    stateRef.current = "drag";
+    stateRef.current = 'drag';
     coordinates.current.push({
       x: e.clientX,
       y: e.clientY,
@@ -53,7 +46,7 @@ export function Canvas(): JSX.Element {
 
   const onMouseUp: MouseEventHandler<HTMLCanvasElement> = (e) => {
     isMouseDownRef.current = false;
-    stateRef.current = "idle";
+    stateRef.current = 'idle';
     coordinates.current = [];
   };
 
@@ -67,7 +60,7 @@ export function Canvas(): JSX.Element {
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
       onMouseUp={onMouseUp}
-      style={{ border: "10px solid red", width: "100%", height: "100%" }}
+      style={{ border: '10px solid red', width: '100%', height: '100%' }}
     >
       Your browser doesn't seem to support canvas.
     </canvas>
