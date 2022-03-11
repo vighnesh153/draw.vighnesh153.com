@@ -7,6 +7,7 @@ import React, { CSSProperties } from 'react';
 import { BrushThickness, Color, EventModes } from '../../utils';
 import { RotateLeft, XMark } from '../../icons';
 import { ModeSelector } from './ModeSelector';
+import { ShowHide, useShowHide } from '../ShowHide';
 
 export interface ToolbarProps {
   mode: EventModes;
@@ -24,9 +25,18 @@ export function Toolbar({
   color: activeColor,
   brushThickness: activeBrushThickness,
   updateMode,
+  updateColor,
+  updateBrushThickness,
 }: ToolbarProps): JSX.Element {
+  const { show: showColorPopover, toggleShow: toggleColorPopover } = useShowHide();
+
   const handleUpdateMode: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     updateMode(e.target.value as EventModes);
+  };
+
+  const handleColorChange = (color: string) => {
+    updateColor(color as Color);
+    toggleColorPopover();
   };
 
   return (
@@ -58,8 +68,33 @@ export function Toolbar({
       />
       <ToolbarSeparator />
       <section style={baseSectionStyles}>
-        <div style={{ width: 35, height: 35, backgroundColor: activeColor, borderRadius: '50%', cursor: 'pointer' }} />
+        <div
+          role="button"
+          style={{ width: 35, height: 35, backgroundColor: activeColor, borderRadius: '50%', cursor: 'pointer' }}
+          onClick={() => toggleColorPopover()}
+        />
         <div style={baseFontStyles}>Color</div>
+        <ShowHide show={showColorPopover}>
+          <div style={basePopoverStyles}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+              {Object.values(Color).map((color) => (
+                <div
+                  key={color}
+                  role="button"
+                  style={{
+                    width: 35,
+                    height: 35,
+                    border: '1px solid #dedede',
+                    borderRadius: '50%',
+                    backgroundColor: color,
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => handleColorChange(color)}
+                />
+              ))}
+            </div>
+          </div>
+        </ShowHide>
       </section>
       <ToolbarSeparator />
       <section style={baseSectionStyles}>
@@ -101,6 +136,7 @@ export function Toolbar({
 }
 
 const baseSectionStyles: CSSProperties = {
+  position: 'relative',
   display: 'flex',
   alignItems: 'center',
   flexDirection: 'column',
@@ -119,3 +155,15 @@ const baseIconStyles: CSSProperties = {
 };
 
 const baseFontStyles: CSSProperties = { fontSize: '0.875rem', fontWeight: 'bold' };
+
+const basePopoverStyles: CSSProperties = {
+  width: 'max-content',
+  maxWidth: 300,
+  padding: '0.5rem',
+  position: 'absolute',
+  top: 60,
+  backgroundColor: 'hsla(0, 0%, 98%, 0.95)',
+  border: '1px solid #dedede',
+  borderRadius: 5,
+  lineHeight: 1,
+};
