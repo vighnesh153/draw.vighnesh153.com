@@ -29,6 +29,7 @@ export function Toolbar({
   updateBrushThickness,
 }: ToolbarProps): JSX.Element {
   const { show: showColorPopover, toggleShow: toggleColorPopover } = useShowHide();
+  const { show: showBrushThicknessPopover, toggleShow: toggleBrushThicknessPopover } = useShowHide();
 
   const handleUpdateMode: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     updateMode(e.target.value as EventModes);
@@ -37,6 +38,11 @@ export function Toolbar({
   const handleColorChange = (color: string) => {
     updateColor(color as Color);
     toggleColorPopover();
+  };
+
+  const handleBrushThicknessChange = (thickness: BrushThickness) => {
+    updateBrushThickness(thickness);
+    toggleBrushThicknessPopover();
   };
 
   return (
@@ -99,6 +105,7 @@ export function Toolbar({
       <ToolbarSeparator />
       <section style={baseSectionStyles}>
         <div
+          role="button"
           style={{
             width: 35,
             height: 35,
@@ -109,6 +116,7 @@ export function Toolbar({
             placeItems: 'center',
             cursor: 'pointer',
           }}
+          onClick={() => toggleBrushThicknessPopover()}
         >
           <div
             style={{
@@ -120,6 +128,35 @@ export function Toolbar({
           />
         </div>
         <div style={baseFontStyles}>Size</div>
+        <ShowHide show={showBrushThicknessPopover}>
+          <div style={basePopoverStyles}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+              {[BrushThickness.xs, BrushThickness.sm, BrushThickness.md, BrushThickness.lg, BrushThickness.xl].map(
+                (thickness) => (
+                  <div
+                    key={thickness}
+                    role="button"
+                    style={{
+                      width: 35,
+                      height: 35,
+                      display: 'grid',
+                      placeItems: 'center',
+                      border: '1px solid #dedede',
+                      borderRadius: '50%',
+                      backgroundColor: 'white',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => handleBrushThicknessChange(thickness as BrushThickness)}
+                  >
+                    <div
+                      style={{ width: thickness, height: thickness, borderRadius: '50%', backgroundColor: activeColor }}
+                    />
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        </ShowHide>
       </section>
       <ToolbarSeparator />
       <section style={baseSectionStyles}>
