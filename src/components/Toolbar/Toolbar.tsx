@@ -2,10 +2,11 @@
  * @author Vighnesh Raut <rvighnes@amazon.com>
  */
 
-import React from 'react';
+import React, { CSSProperties } from 'react';
 
-import { BrushThickness, Color, EventModes } from '@utils';
-import { Fill, Pencil } from '@icons';
+import { BrushThickness, Color, EventModes } from '../../utils';
+import { RotateLeft, XMark } from '../../icons';
+import { ModeSelector } from './ModeSelector';
 
 export interface ToolbarProps {
   mode: EventModes;
@@ -48,60 +49,20 @@ export function Toolbar({
         gap: 20,
       }}
     >
-      <section className="section-mode" style={{ display: 'flex', gap: 20 }}>
-        {[
-          { mode: EventModes.Draw, Component: Pencil, label: 'Draw' },
-          { mode: EventModes.Fill, Component: Fill, label: 'Fill' },
-        ].map(({ mode, Component, label }) => (
-          <div style={{ lineHeight: 0 }} aria-label={label}>
-            <label
-              htmlFor={mode}
-              style={{ lineHeight: 0, display: 'flex', alignItems: 'center', flexDirection: 'column', gap: 10 }}
-            >
-              <div>
-                <Component
-                  style={{
-                    width: 35,
-                    height: 35,
-                    padding: '0.2rem',
-                    cursor: 'pointer',
-                    backgroundColor: 'hsl(0, 0%, 100%)',
-                    border: '3px solid',
-                    borderRadius: '50%',
-                    borderColor: activeMode === mode ? Color.Purple : Color.Gray,
-                    fill: activeMode === mode ? Color.Purple : Color.Black,
-                  }}
-                />
-              </div>
-              <div
-                style={{
-                  fontSize: '0.875rem',
-                  fontWeight: 'bold',
-                  color: activeMode === mode ? Color.Purple : Color.Black,
-                }}
-              >
-                {label}
-              </div>
-            </label>
-            <input
-              type="radio"
-              name="section-mode"
-              id={mode}
-              value={mode}
-              checked={activeMode === mode}
-              style={{ display: 'none' }}
-              onChange={handleUpdateMode}
-            />
-          </div>
-        ))}
-      </section>
+      <ModeSelector
+        activeMode={activeMode}
+        handleChange={handleUpdateMode}
+        style={baseSectionStyles}
+        iconStyle={baseIconStyles}
+        fontStyle={baseFontStyles}
+      />
       <ToolbarSeparator />
-      <section style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', lineHeight: 0, gap: 10 }}>
+      <section style={baseSectionStyles}>
         <div style={{ width: 35, height: 35, backgroundColor: activeColor, borderRadius: '50%', cursor: 'pointer' }} />
-        <div style={{ fontSize: '0.875rem', fontWeight: 'bold' }}>Color</div>
+        <div style={baseFontStyles}>Color</div>
       </section>
       <ToolbarSeparator />
-      <section style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', lineHeight: 0, gap: 10 }}>
+      <section style={baseSectionStyles}>
         <div
           style={{
             width: 35,
@@ -123,8 +84,38 @@ export function Toolbar({
             }}
           />
         </div>
-        <div style={{ fontSize: '0.875rem', fontWeight: 'bold' }}>Size</div>
+        <div style={baseFontStyles}>Size</div>
+      </section>
+      <ToolbarSeparator />
+      <section style={baseSectionStyles}>
+        <RotateLeft role="button" style={baseIconStyles} />
+        <div style={baseFontStyles}>Undo</div>
+      </section>
+      <ToolbarSeparator />
+      <section style={baseSectionStyles}>
+        <XMark role="button" style={baseIconStyles} />
+        <div style={baseFontStyles}>Clear</div>
       </section>
     </section>
   );
 }
+
+const baseSectionStyles: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  flexDirection: 'column',
+  lineHeight: 0,
+  gap: 10,
+};
+
+const baseIconStyles: CSSProperties = {
+  width: 35,
+  height: 35,
+  padding: '0.2rem',
+  cursor: 'pointer',
+  backgroundColor: 'hsl(0, 0%, 100%)',
+  border: `3px solid ${Color.Gray}`,
+  borderRadius: '50%',
+};
+
+const baseFontStyles: CSSProperties = { fontSize: '0.875rem', fontWeight: 'bold' };
