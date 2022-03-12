@@ -6,6 +6,7 @@ import React, { MouseEventHandler, MutableRefObject, Ref, useEffect, useRef } fr
 
 import { CanvasHelper, Coordinates, DrawEvents, DrawLineEvent, DrawPointEvent, EventMode, FillEvent } from '../utils';
 import { useToolbar } from '../contexts';
+import { useEventProcessor } from '../hooks';
 
 type State = 'idle' | 'pressed' | 'drag';
 
@@ -23,6 +24,11 @@ export function Canvas({ canvasRef, triggerEvents, ...builders }: CanvasProps): 
   const stateRef = useRef<State>('idle');
   const canvasHelperRef = useRef<CanvasHelper>();
   const previousCoordinatesRef = useRef<Coordinates | null>(null);
+
+  /**
+   * Processes the events ❤️ 😇 🥺
+   */
+  useEventProcessor({ canvasHelper: canvasHelperRef });
 
   /**
    * Handles mousedown event's interaction with the current state
@@ -56,7 +62,9 @@ export function Canvas({ canvasRef, triggerEvents, ...builders }: CanvasProps): 
       coordinate1: previousCoordinatesRef.current!,
       coordinate2: currentCoordinates,
     });
-    triggerEvents(drawLineEvent);
+    if (mode === EventMode.Draw) {
+      triggerEvents(drawLineEvent);
+    }
 
     // set previous coordinates to current coordinates
     previousCoordinatesRef.current = currentCoordinates;
@@ -85,7 +93,9 @@ export function Canvas({ canvasRef, triggerEvents, ...builders }: CanvasProps): 
     if (previousState === 'idle') return;
 
     if (previousState === 'drag') {
-      triggerEvents(drawLineEvent, drawPointEvent);
+      if (mode === EventMode.Draw) {
+        triggerEvents(drawLineEvent, drawPointEvent);
+      }
       return;
     }
 
