@@ -4,3 +4,5 @@
 
 export * from './Toolbar';
 export * from './Canvas';
+export * from './ShowHide';
+export * from './AppProviders';

@@ -5,22 +5,15 @@
 import React, { CSSProperties } from 'react';
 
 import { not } from '@vighnesh153/utils';
-import { BrushThickness, Color, EventModes } from '../../utils';
+import { Color } from '../../utils';
 import { RotateLeft, RotateRight, XMark } from '../../icons';
 import { ModeSelector } from './ModeSelector';
-import { ShowHide, useShowHide } from '../ShowHide';
 import { ColorPopover } from './ColorPopover';
 import { BrushThicknessPopover } from './BrushThicknessPopover';
 
 export interface ToolbarProps {
-  mode: EventModes;
-  color: Color;
-  brushThickness: BrushThickness;
   isUndoAvailable: () => boolean;
   isRedoAvailable: () => boolean;
-  updateMode: (mode: EventModes) => void;
-  updateColor: (color: Color) => void;
-  updateBrushThickness: (brushThickness: BrushThickness) => void;
   undo: () => void;
   redo: () => void;
   onClear: (color: Color) => void;
@@ -28,36 +21,7 @@ export interface ToolbarProps {
 
 const ToolbarSeparator = () => <div style={{ height: 25, width: 2, backgroundColor: '#dedede' }} />;
 
-export function Toolbar({
-  mode: activeMode,
-  color: activeColor,
-  brushThickness: activeBrushThickness,
-  isUndoAvailable,
-  isRedoAvailable,
-  updateMode,
-  updateColor,
-  updateBrushThickness,
-  undo,
-  redo,
-  onClear,
-}: ToolbarProps): JSX.Element {
-  const { show: showColorPopover, toggleShow: toggleColorPopover } = useShowHide();
-  const { show: showBrushThicknessPopover, toggleShow: toggleBrushThicknessPopover } = useShowHide();
-
-  const handleUpdateMode: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    updateMode(e.target.value as EventModes);
-  };
-
-  const handleColorChange = (color: string) => {
-    updateColor(color as Color);
-    toggleColorPopover();
-  };
-
-  const handleBrushThicknessChange = (thickness: BrushThickness) => {
-    updateBrushThickness(thickness);
-    toggleBrushThicknessPopover();
-  };
-
+export function Toolbar({ isUndoAvailable, isRedoAvailable, undo, redo, onClear }: ToolbarProps): JSX.Element {
   return (
     <section
       style={{
@@ -78,58 +42,14 @@ export function Toolbar({
         gap: 20,
       }}
     >
-      <ModeSelector
-        activeMode={activeMode}
-        handleChange={handleUpdateMode}
-        style={baseSectionStyles}
-        iconStyle={baseIconStyles}
-        fontStyle={baseFontStyles}
-      />
+      <ModeSelector style={baseSectionStyles} iconStyle={baseIconStyles} fontStyle={baseFontStyles} />
       <ToolbarSeparator />
       <section style={baseSectionStyles}>
-        <div
-          role="button"
-          style={{ width: 35, height: 35, backgroundColor: activeColor, borderRadius: '50%', cursor: 'pointer' }}
-          onClick={() => toggleColorPopover()}
-        />
-        <div style={baseFontStyles}>Color</div>
-        <ShowHide show={showColorPopover}>
-          <ColorPopover style={basePopoverStyles} handleColorChange={handleColorChange} />
-        </ShowHide>
+        <ColorPopover style={basePopoverStyles} baseFontStyles={baseFontStyles} />
       </section>
       <ToolbarSeparator />
       <section style={baseSectionStyles}>
-        <div
-          role="button"
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: '50%',
-            backgroundColor: '#fff',
-            border: '1px solid #dedede',
-            display: 'grid',
-            placeItems: 'center',
-            cursor: 'pointer',
-          }}
-          onClick={() => toggleBrushThicknessPopover()}
-        >
-          <div
-            style={{
-              backgroundColor: activeColor,
-              width: activeBrushThickness,
-              height: activeBrushThickness,
-              borderRadius: '50%',
-            }}
-          />
-        </div>
-        <div style={baseFontStyles}>Size</div>
-        <ShowHide show={showBrushThicknessPopover}>
-          <BrushThicknessPopover
-            style={basePopoverStyles}
-            handleBrushThicknessChange={handleBrushThicknessChange}
-            activeColor={activeColor}
-          />
-        </ShowHide>
+        <BrushThicknessPopover style={basePopoverStyles} baseFontStyles={baseFontStyles} />
       </section>
       <ToolbarSeparator />
       <section style={baseSectionStyles}>

@@ -1,7 +1,7 @@
-export type Coordinates = {
-  x: number;
-  y: number;
-};
+export enum EventMode {
+  Draw = 'Draw',
+  Fill = 'Fill',
+}
 
 export enum Color {
   Black = 'hsl(0, 0%, 0%)',
@@ -23,6 +23,12 @@ export enum Color {
   DarkRed = 'hsl(0, 66%, 41%)',
   White = 'hsl(0, 0%, 100%)',
 }
+
+export type Coordinates = {
+  x: number;
+  y: number;
+};
+
 export enum BrushThickness {
   xs = 5,
   sm = 10,
@@ -31,41 +37,31 @@ export enum BrushThickness {
   xl = 25,
 }
 
-export enum EventModes {
-  Draw = 'draw',
-  Fill = 'fill',
-}
-
-export type ClickDrawEvent = {
-  eventId: string;
-  type: 'click';
-  mode: EventModes.Draw;
+export type DrawPointEvent = {
+  type: 'point';
   coordinates: Coordinates;
   color: Color;
   brushThickness: BrushThickness;
 };
 
-export type ClickFillEvent = {
-  eventId: string;
-  type: 'click';
-  mode: EventModes.Fill;
+export type FillEvent = {
+  type: 'fill';
   coordinates: Coordinates; // Where the fill should begin
   color: Color;
 };
 
-export type DragDrawEvent = {
-  eventId: string;
-  type: 'drag';
-  mode: EventModes.Draw;
-  allCoordinates: Coordinates[];
+// Draws the line between 2 points
+export type DrawLineEvent = {
+  type: 'line';
+  coordinate1: Coordinates;
+  coordinate2: Coordinates;
   color: Color;
   brushThickness: BrushThickness;
 };
 
-export type ScreenClearEvent = {
-  eventId: string;
-  type: 'screen-clear';
+export type ClearScreenEvent = {
+  type: 'clear';
   color: Color;
 };
 
-export type DrawEvents = ClickDrawEvent | ClickFillEvent | DragDrawEvent | ScreenClearEvent;
+export type DrawEvents = DrawPointEvent | FillEvent | DrawLineEvent | ClearScreenEvent;

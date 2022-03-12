@@ -3,61 +3,91 @@
  */
 
 import { useReducer } from 'react';
-import { DrawEvents } from '../utils';
+import { not } from '@vighnesh153/utils';
+
+import { Color, DrawEvents } from '../utils';
 
 export interface CanvasHistoryState {
   events: DrawEvents[];
-  eventsPointer: number | null;
+  currentEventPointer: number | null;
 }
 
 const reducer = (state: CanvasHistoryState, updates: Partial<CanvasHistoryState>): CanvasHistoryState => {
   return { ...state, ...updates };
 };
 
-export const useCanvasHistory = () => {
-  const [{ events, eventsPointer }, setState] = useReducer(reducer, {
-    events: [],
-    eventsPointer: null,
+export interface CanvasHistoryProps {
+  resetTo: (updatedEvents: DrawEvents[]) => void;
+  addNew: (newEvents: DrawEvents[]) => void;
+}
+
+/**
+ * For doing some cool stuff 😎😎😎
+ */
+export const useCanvasHistory = (props: CanvasHistoryProps) => {
+  const [{ events, currentEventPointer }, setState] = useReducer(reducer, {
+    events: [{ type: 'clear', color: Color.White }],
+    currentEventPointer: null,
   });
 
-  console.log(events.length);
-
   // Hos no history
-  const isUndoAvailable = () => (eventsPointer ?? 0) > 0;
+  const isUndoAvailable = () => (currentEventPointer ?? 0) > 0;
 
   // Has at least 1 event to go forward to
-  const isRedoAvailable = () => (eventsPointer ?? 0) < events.length - 1;
+  const isRedoAvailable = () => (currentEventPointer ?? 0) < events.length - 1;
 
   // Undo changes
   const undo = () => {
-    if (isUndoAvailable()) {
-      setState({ eventsPointer: eventsPointer! - 1 });
+    if (not(isUndoAvailable())) return;
+
+    let previousEventPointer = currentEventPointer! - 1;
+    let previousEvent = events[previousEventPointer];
+
+    // As, at the end of every drag, we add a click event,
+    // drag-event can never be a stopping point for the eventPointer
+    while (previousEvent.type !== 'line') {
+      previousEventPointer -= 1;
+      previousEvent = events[previousEventPointer];
     }
+
+    setState({ currentEventPointer: previousEventPointer });
+
+    // As we try to undo, we don't have a way to just undo the previous events
+    // We have to re-draw all the events from 0 to n-1 which gives an
+    // illusion of undo
+    props.resetTo(events.slice(0, previousEventPointer + 1));
   };
 
   // Redo changes
   const redo = () => {
-    if (isRedoAvailable()) {
-      setState({ eventsPointer: eventsPointer! + 1 });
+    if (not(isRedoAvailable())) return;
+
+    let nextEventPointer = currentEventPointer! + 1;
+    let nextEvent = events[nextEventPointer];
+
+    const newEvents: DrawEvents[] = [];
+    while (nextEvent && nextEvent.type === 'line') {
+      newEvents.push(nextEvent);
+      nextEventPointer += 1;
+      nextEvent = events[nextEventPointer];
     }
+
+    newEvents.push(nextEvent);
+    setState({ currentEventPointer: nextEventPointer });
+
+    props.addNew(newEvents);
   };
 
-  // Adds new event and deletes all the future events
-  const addNewEvent = (event: DrawEvents) => {
-    // First event
-    if (eventsPointer === null) {
-      setState({ eventsPointer: 0, events: [event] });
-      return;
-    }
-
-    const previousEvents = events.slice(0, eventsPointer + 1);
-    setState({ eventsPointer: eventsPointer! + 1, events: [...previousEvents, event] });
+  // Adds new events: "git push --force" strategy
+  const triggerEvents = (...newEvents: DrawEvents[]) => {
+    const previousEvents = events.slice(0, (currentEventPointer ?? -1) + 1);
+    const combinedEvents = [...previousEvents, ...newEvents];
+    setState({
+      currentEventPointer: (currentEventPointer ?? -1) + newEvents.length,
+      events: combinedEvents,
+    });
+    props.addNew(combinedEvents);
   };
 
-  const replaceEvent = (index: number, event: DrawEvents) => {
-    const newEvents = events.slice().splice(index, 1, event);
-    setState({ events: newEvents });
-  };
-
-  return { eventsPointer, events, addNewEvent, replaceEvent, isUndoAvailable, isRedoAvailable, undo, redo };
+  return { isUndoAvailable, isRedoAvailable, undo, redo, triggerEvents };
 };

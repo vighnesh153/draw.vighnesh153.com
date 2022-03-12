@@ -3,27 +3,26 @@
  */
 
 import React, { MouseEventHandler, MutableRefObject, Ref, useEffect, useRef } from 'react';
-import { BrushThickness, CanvasHelper, Color, EventModes } from '../utils';
-import { OnClickDrawOptions, OnClickFillOptions, OnDragDrawOptions } from '../hooks';
+
+import { CanvasHelper, Coordinates, DrawEvents, DrawLineEvent, DrawPointEvent, EventMode, FillEvent } from '../utils';
+import { useToolbar } from '../contexts';
 
 type State = 'idle' | 'pressed' | 'drag';
-type Coordinate = { x: number; y: number };
 
 export interface CanvasProps {
-  mode: EventModes;
-  color: Color;
-  brushThickness: BrushThickness;
   canvasRef: Ref<HTMLCanvasElement>;
-  onClickDraw: (options: OnClickDrawOptions) => void;
-  onClickFill: (options: OnClickFillOptions) => void;
-  onDragDraw: (options: OnDragDrawOptions) => void;
+  buildDrawLineEvent: (options: Omit<DrawLineEvent, 'type'>) => DrawLineEvent;
+  buildFillEvent: (options: Omit<FillEvent, 'type'>) => FillEvent;
+  buildDrawPointEvent: (options: Omit<DrawPointEvent, 'type'>) => DrawPointEvent;
+  triggerEvents: (...events: DrawEvents[]) => void;
 }
 
-export function Canvas({ mode, color, brushThickness, canvasRef, ...actions }: CanvasProps): JSX.Element {
+export function Canvas({ canvasRef, triggerEvents, ...builders }: CanvasProps): JSX.Element {
+  const { mode, color, brushThickness } = useToolbar();
   const internalCanvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<State>('idle');
   const canvasHelperRef = useRef<CanvasHelper>();
-  const coordinatesRef = useRef<Coordinate[]>([]);
+  const previousCoordinatesRef = useRef<Coordinates | null>(null);
 
   /**
    * Handles mousedown event's interaction with the current state
@@ -31,34 +30,36 @@ export function Canvas({ mode, color, brushThickness, canvasRef, ...actions }: C
   const onMouseDown: MouseEventHandler<HTMLCanvasElement> = (e) => {
     const coordinates = { x: e.clientX, y: e.clientY };
     const previousState = stateRef.current;
-    const dragCoordinates = coordinatesRef.current;
 
     if (previousState !== 'idle') return;
 
     stateRef.current = 'pressed';
-    dragCoordinates.push(coordinates);
+    previousCoordinatesRef.current = coordinates;
   };
 
   /**
    * Handles mousemove event's interaction with the current state
    */
   const onMouseMove: MouseEventHandler<HTMLCanvasElement> = (e) => {
-    const coordinates = { x: e.clientX, y: e.clientY };
+    const currentCoordinates = { x: e.clientX, y: e.clientY };
     const previousState = stateRef.current;
-    const dragCoordinates = coordinatesRef.current;
 
     if (previousState === 'idle') return;
-    if (mode === 'fill') return;
+    if (mode === EventMode.Fill) return;
 
     stateRef.current = 'drag';
-    dragCoordinates.push(coordinates);
 
-    actions.onDragDraw({
+    // trigger event
+    const drawLineEvent = builders.buildDrawLineEvent({
       color,
       brushThickness,
-      allCoordinates: dragCoordinates,
-      replacePreviousDragEvent: previousState === 'drag',
+      coordinate1: previousCoordinatesRef.current!,
+      coordinate2: currentCoordinates,
     });
+    triggerEvents(drawLineEvent);
+
+    // set previous coordinates to current coordinates
+    previousCoordinatesRef.current = currentCoordinates;
   };
 
   /**
@@ -66,31 +67,34 @@ export function Canvas({ mode, color, brushThickness, canvasRef, ...actions }: C
    */
   const onMouseUp: MouseEventHandler<HTMLCanvasElement> = (e) => {
     const coordinates = { x: e.clientX, y: e.clientY };
+    const previousCoordinates = previousCoordinatesRef.current!;
     const previousState = stateRef.current;
-    const previousDragCoordinates = coordinatesRef.current;
     stateRef.current = 'idle';
-    coordinatesRef.current = [];
+    previousCoordinatesRef.current = null;
+
+    const fillEvent = builders.buildFillEvent({ color, coordinates });
+    const drawPointEvent = builders.buildDrawPointEvent({ color, coordinates, brushThickness });
+    const drawLineEvent = builders.buildDrawLineEvent({
+      color,
+      brushThickness,
+      coordinate1: previousCoordinates,
+      coordinate2: coordinates,
+    });
 
     // mouse up does nothing when idle
     if (previousState === 'idle') return;
 
     if (previousState === 'drag') {
-      actions.onDragDraw({
-        color,
-        brushThickness,
-        allCoordinates: [...previousDragCoordinates, coordinates],
-        replacePreviousDragEvent: previousDragCoordinates.length > 0,
-      });
+      triggerEvents(drawLineEvent, drawPointEvent);
       return;
     }
 
-    // Previous state was "pressed"
-
-    if (mode === 'draw') {
-      actions.onClickDraw({ color, brushThickness, coordinates });
-    } else {
-      actions.onClickFill({ color, coordinates });
+    if (previousState === 'pressed') {
+      triggerEvents(mode === EventMode.Draw ? drawPointEvent : fillEvent);
+      return;
     }
+
+    throw new Error('We should never reach here.');
   };
 
   useEffect(() => {
