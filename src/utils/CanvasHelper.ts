@@ -58,6 +58,7 @@ export class CanvasHelper {
     this.canvasContext.save();
     this.canvasContext.beginPath();
     this.canvasContext.lineWidth = lineWidth;
+    this.canvasContext.lineCap = 'round';
     this.canvasContext.strokeStyle = color;
     this.canvasContext.moveTo(x1, y1);
     this.canvasContext.lineTo(x2, y2);
