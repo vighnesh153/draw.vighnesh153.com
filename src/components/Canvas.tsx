@@ -2,7 +2,7 @@
  * @author Vighnesh Raut <rvighnes@amazon.com>
  */
 
-import React, { MouseEventHandler, useEffect, useRef } from 'react';
+import React, { MouseEventHandler, MutableRefObject, Ref, useEffect, useRef } from 'react';
 import { BrushThickness, CanvasHelper, Color, EventModes } from '../utils';
 import { OnClickDrawOptions, OnClickFillOptions, OnDragDrawOptions } from '../hooks';
 
@@ -13,13 +13,14 @@ export interface CanvasProps {
   mode: EventModes;
   color: Color;
   brushThickness: BrushThickness;
+  canvasRef: Ref<HTMLCanvasElement>;
   onClickDraw: (options: OnClickDrawOptions) => void;
   onClickFill: (options: OnClickFillOptions) => void;
   onDragDraw: (options: OnDragDrawOptions) => void;
 }
 
-export function Canvas({ mode, color, brushThickness, ...actions }: CanvasProps): JSX.Element {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+export function Canvas({ mode, color, brushThickness, canvasRef, ...actions }: CanvasProps): JSX.Element {
+  const internalCanvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<State>('idle');
   const canvasHelperRef = useRef<CanvasHelper>();
   const coordinatesRef = useRef<Coordinate[]>([]);
@@ -97,12 +98,20 @@ export function Canvas({ mode, color, brushThickness, ...actions }: CanvasProps)
   }, [color, brushThickness, mode]);
 
   useEffect(() => {
-    canvasHelperRef.current = new CanvasHelper(canvasRef.current!);
+    canvasHelperRef.current = new CanvasHelper(internalCanvasRef.current!);
   }, []);
 
   return (
     <canvas
-      ref={canvasRef}
+      ref={(element) => {
+        (internalCanvasRef as MutableRefObject<HTMLCanvasElement>).current = element!;
+        if (typeof canvasRef === 'function') {
+          canvasRef(element);
+        } else {
+          // @ts-ignore
+          canvasRef!.current = element!;
+        }
+      }}
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
       style={{ border: '10px solid red', width: '100%', height: '100%' }}

@@ -41,6 +41,7 @@
       "prettier"
     ],
     "rules": {
+      "@typescript-eslint/ban-ts-comment": "warn",
       "@typescript-eslint/no-empty-interface": "warn"
     }
   },
