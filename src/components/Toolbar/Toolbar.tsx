@@ -8,6 +8,8 @@ import { BrushThickness, Color, EventModes } from '../../utils';
 import { RotateLeft, XMark } from '../../icons';
 import { ModeSelector } from './ModeSelector';
 import { ShowHide, useShowHide } from '../ShowHide';
+import { ColorPopover } from './ColorPopover';
+import { BrushThicknessPopover } from './BrushThicknessPopover';
 
 export interface ToolbarProps {
   mode: EventModes;
@@ -81,25 +83,7 @@ export function Toolbar({
         />
         <div style={baseFontStyles}>Color</div>
         <ShowHide show={showColorPopover}>
-          <div style={basePopoverStyles}>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-              {Object.values(Color).map((color) => (
-                <div
-                  key={color}
-                  role="button"
-                  style={{
-                    width: 35,
-                    height: 35,
-                    border: '1px solid #dedede',
-                    borderRadius: '50%',
-                    backgroundColor: color,
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => handleColorChange(color)}
-                />
-              ))}
-            </div>
-          </div>
+          <ColorPopover style={basePopoverStyles} handleColorChange={handleColorChange} />
         </ShowHide>
       </section>
       <ToolbarSeparator />
@@ -107,8 +91,8 @@ export function Toolbar({
         <div
           role="button"
           style={{
-            width: 35,
-            height: 35,
+            width: 40,
+            height: 40,
             borderRadius: '50%',
             backgroundColor: '#fff',
             border: '1px solid #dedede',
@@ -129,43 +113,25 @@ export function Toolbar({
         </div>
         <div style={baseFontStyles}>Size</div>
         <ShowHide show={showBrushThicknessPopover}>
-          <div style={basePopoverStyles}>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-              {[BrushThickness.xs, BrushThickness.sm, BrushThickness.md, BrushThickness.lg, BrushThickness.xl].map(
-                (thickness) => (
-                  <div
-                    key={thickness}
-                    role="button"
-                    style={{
-                      width: 35,
-                      height: 35,
-                      display: 'grid',
-                      placeItems: 'center',
-                      border: '1px solid #dedede',
-                      borderRadius: '50%',
-                      backgroundColor: 'white',
-                      cursor: 'pointer',
-                    }}
-                    onClick={() => handleBrushThicknessChange(thickness as BrushThickness)}
-                  >
-                    <div
-                      style={{ width: thickness, height: thickness, borderRadius: '50%', backgroundColor: activeColor }}
-                    />
-                  </div>
-                )
-              )}
-            </div>
-          </div>
+          <BrushThicknessPopover
+            style={basePopoverStyles}
+            handleBrushThicknessChange={handleBrushThicknessChange}
+            activeColor={activeColor}
+          />
         </ShowHide>
       </section>
       <ToolbarSeparator />
       <section style={baseSectionStyles}>
-        <RotateLeft role="button" style={baseIconStyles} />
+        <div role="button" style={baseIconContainerStyles}>
+          <RotateLeft style={baseIconStyles} />
+        </div>
         <div style={baseFontStyles}>Undo</div>
       </section>
       <ToolbarSeparator />
       <section style={baseSectionStyles}>
-        <XMark role="button" style={baseIconStyles} />
+        <div role="button" style={baseIconContainerStyles}>
+          <XMark style={baseIconStyles} />
+        </div>
         <div style={baseFontStyles}>Clear</div>
       </section>
     </section>
@@ -182,13 +148,18 @@ const baseSectionStyles: CSSProperties = {
 };
 
 const baseIconStyles: CSSProperties = {
-  width: 35,
-  height: 35,
-  padding: '0.2rem',
+  width: 20,
+  height: 20,
   cursor: 'pointer',
   backgroundColor: 'hsl(0, 0%, 100%)',
-  border: `3px solid ${Color.Gray}`,
+};
+
+const baseIconContainerStyles: CSSProperties = {
+  padding: 5,
+  border: '3px solid',
   borderRadius: '50%',
+  backgroundColor: 'transparent',
+  borderColor: Color.Gray,
 };
 
 const baseFontStyles: CSSProperties = { fontSize: '0.875rem', fontWeight: 'bold' };

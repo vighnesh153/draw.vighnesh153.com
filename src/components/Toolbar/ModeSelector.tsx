@@ -22,6 +22,8 @@ export function ModeSelector({
   iconStyle,
   fontStyle,
 }: ModeSelectorProps): JSX.Element {
+  const highlightColor = Color.Orange;
+
   return (
     <section style={{ ...style, flexDirection: 'row', gap: 20 }}>
       {[
@@ -33,19 +35,28 @@ export function ModeSelector({
             htmlFor={mode}
             style={{ lineHeight: 0, display: 'flex', alignItems: 'center', flexDirection: 'column', gap: 10 }}
           >
-            <div role="button">
+            <div
+              role="button"
+              style={{
+                padding: 5,
+                border: '3px solid',
+                borderRadius: '50%',
+                backgroundColor: activeMode === mode ? highlightColor : 'transparent',
+                borderColor: activeMode === mode ? highlightColor : Color.Gray,
+              }}
+            >
               <Component
                 style={{
                   ...iconStyle,
-                  borderColor: activeMode === mode ? Color.Purple : Color.Gray,
-                  fill: activeMode === mode ? Color.Purple : Color.Black,
+                  backgroundColor: activeMode === mode ? highlightColor : 'transparent',
+                  fill: activeMode === mode ? 'white' : Color.Black,
                 }}
               />
             </div>
             <div
               style={{
                 ...fontStyle,
-                color: activeMode === mode ? Color.Purple : Color.Black,
+                color: activeMode === mode ? highlightColor : Color.Black,
               }}
             >
               {modeTitle}
