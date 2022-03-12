@@ -32,10 +32,10 @@ export function Canvas({ mode, color, brushThickness, canvasRef, ...actions }: C
     const coordinates = { x: e.clientX, y: e.clientY };
     const previousState = stateRef.current;
     const dragCoordinates = coordinatesRef.current;
-    stateRef.current = 'pressed';
 
     if (previousState !== 'idle') return;
 
+    stateRef.current = 'pressed';
     dragCoordinates.push(coordinates);
   };
 
@@ -46,11 +46,12 @@ export function Canvas({ mode, color, brushThickness, canvasRef, ...actions }: C
     const coordinates = { x: e.clientX, y: e.clientY };
     const previousState = stateRef.current;
     const dragCoordinates = coordinatesRef.current;
-    stateRef.current = 'drag';
-    dragCoordinates.push(coordinates);
 
     if (previousState === 'idle') return;
     if (mode === 'fill') return;
+
+    stateRef.current = 'drag';
+    dragCoordinates.push(coordinates);
 
     actions.onDragDraw({
       color,
@@ -63,39 +64,34 @@ export function Canvas({ mode, color, brushThickness, canvasRef, ...actions }: C
   /**
    * Handles mouseup event's interaction with the current state
    */
-  useEffect(() => {
-    const onMouseUp = (e: MouseEvent) => {
-      const coordinates = { x: e.clientX, y: e.clientY };
-      const previousState = stateRef.current;
-      const previousDragCoordinates = coordinatesRef.current;
-      stateRef.current = 'idle';
-      coordinatesRef.current = [];
+  const onMouseUp: MouseEventHandler<HTMLCanvasElement> = (e) => {
+    const coordinates = { x: e.clientX, y: e.clientY };
+    const previousState = stateRef.current;
+    const previousDragCoordinates = coordinatesRef.current;
+    stateRef.current = 'idle';
+    coordinatesRef.current = [];
 
-      // mouse up does nothing when idle
-      if (previousState === 'idle') return;
+    // mouse up does nothing when idle
+    if (previousState === 'idle') return;
 
-      if (previousState === 'drag') {
-        actions.onDragDraw({
-          color,
-          brushThickness,
-          allCoordinates: [...previousDragCoordinates, coordinates],
-          replacePreviousDragEvent: previousDragCoordinates.length > 0,
-        });
-        return;
-      }
+    if (previousState === 'drag') {
+      actions.onDragDraw({
+        color,
+        brushThickness,
+        allCoordinates: [...previousDragCoordinates, coordinates],
+        replacePreviousDragEvent: previousDragCoordinates.length > 0,
+      });
+      return;
+    }
 
-      // Previous state was "pressed"
+    // Previous state was "pressed"
 
-      if (mode === 'draw') {
-        actions.onClickDraw({ color, brushThickness, coordinates });
-      } else {
-        actions.onClickFill({ color, coordinates });
-      }
-    };
-
-    window.addEventListener('mouseup', onMouseUp);
-    return () => window.removeEventListener('mouseup', onMouseUp);
-  }, [color, brushThickness, mode]);
+    if (mode === 'draw') {
+      actions.onClickDraw({ color, brushThickness, coordinates });
+    } else {
+      actions.onClickFill({ color, coordinates });
+    }
+  };
 
   useEffect(() => {
     canvasHelperRef.current = new CanvasHelper(internalCanvasRef.current!);
@@ -114,6 +110,7 @@ export function Canvas({ mode, color, brushThickness, canvasRef, ...actions }: C
       }}
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
+      onMouseUp={onMouseUp}
       style={{ border: '10px solid red', width: '100%', height: '100%' }}
     >
       Your browser doesn't seem to support canvas. Please update your browser or try opening in a different browser

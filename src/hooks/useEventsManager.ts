@@ -89,7 +89,6 @@ export const useEventsManager = () => {
    * Draw the lines from where the user clicked
    *
    * @param options
-   * @param replacePreviousDragEvent
    */
   const onDragDraw = (options: OnDragDrawOptions) => {
     const event: DragDrawEvent = {

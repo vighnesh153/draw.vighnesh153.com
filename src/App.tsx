@@ -10,8 +10,18 @@ import { useEventsManager, useToolbar } from './hooks';
 export function App(): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { updateMode, updateColor, updateBrushThickness, ...others } = useToolbar();
-  const { isUndoAvailable, undo, isRedoAvailable, redo, onClickFill, onClickDraw, onDragDraw, onClear, activeEvent } =
-    useEventsManager();
+  const {
+    isUndoAvailable,
+    undo,
+    isRedoAvailable,
+    redo,
+    onClickFill,
+    onClickDraw,
+    onDragDraw,
+    onClear,
+    activeEvent,
+    previousEventIds,
+  } = useEventsManager();
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>

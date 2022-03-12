@@ -20,6 +20,8 @@ export const useCanvasHistory = () => {
     eventsPointer: null,
   });
 
+  console.log(events.length);
+
   // Hos no history
   const isUndoAvailable = () => (eventsPointer ?? 0) > 0;
 
@@ -48,7 +50,7 @@ export const useCanvasHistory = () => {
       return;
     }
 
-    const previousEvents = events.slice(0, (eventsPointer ?? 0) + 1);
+    const previousEvents = events.slice(0, eventsPointer + 1);
     setState({ eventsPointer: eventsPointer! + 1, events: [...previousEvents, event] });
   };
 
