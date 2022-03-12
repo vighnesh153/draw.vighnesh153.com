@@ -43,6 +43,7 @@ export function ModeSelector({
                 borderRadius: '50%',
                 backgroundColor: activeMode === mode ? highlightColor : 'transparent',
                 borderColor: activeMode === mode ? highlightColor : Color.Gray,
+                cursor: 'pointer',
               }}
             >
               <Component

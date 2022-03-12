@@ -2,8 +2,8 @@
  * @author Vighnesh Raut <rvighnes@amazon.com>
  */
 
-import { useReducer, useState } from "react";
-import { DrawEvents } from "../utils/events";
+import { useReducer } from 'react';
+import { DrawEvents } from '../utils';
 
 export interface CanvasHistoryState {
   events: DrawEvents[];

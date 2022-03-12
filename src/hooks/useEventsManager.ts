@@ -12,11 +12,11 @@ import {
   DrawEvents,
   EventModes,
   ScreenClearEvent,
-} from "../utils/events";
-import { useCanvasHistory } from "./useCanvasHistory";
-import { useEffect, useState } from "react";
+} from '../utils';
+import { useCanvasHistory } from './useCanvasHistory';
+import { useEffect, useState } from 'react';
 
-const createEventId = (): string => {
+export const createEventId = (): string => {
   return Math.random().toString();
 };
 
@@ -35,17 +35,24 @@ export interface OnDragDrawOptions {
   color: Color;
   brushThickness: BrushThickness;
   allCoordinates: Coordinates[];
+  replacePreviousDragEvent?: boolean;
 }
 
 export const useEventsManager = () => {
   const { eventsPointer, events, addNewEvent, replaceEvent, ...canvasHistoryOthers } = useCanvasHistory();
-  const [activeEvent, setActiveEvent] = useState<DrawEvents | null>(null);
+  const [{ activeEvent, previousEventIds }, setDerivedState] = useState<{
+    activeEvent: DrawEvents | null;
+    previousEventIds: Set<string>;
+  }>({ activeEvent: null, previousEventIds: new Set() });
 
   // Updates the current active event (which needs to be processed)
   useEffect(() => {
     if (eventsPointer === null) return;
     if (events.length === 0) return;
-    setActiveEvent({ ...events[eventsPointer] });
+    setDerivedState({
+      activeEvent: events[eventsPointer],
+      previousEventIds: new Set(events.slice(0, eventsPointer + 1).map((event) => event.eventId)),
+    });
   }, [events, eventsPointer]);
 
   /**
@@ -55,7 +62,7 @@ export const useEventsManager = () => {
    */
   const onClickDraw = (options: OnClickDrawOptions) => {
     const event: ClickDrawEvent = {
-      type: "click",
+      type: 'click',
       mode: EventModes.Draw,
       eventId: createEventId(),
       ...options,
@@ -70,7 +77,7 @@ export const useEventsManager = () => {
    */
   const onClickFill = (options: OnClickFillOptions) => {
     const event: ClickFillEvent = {
-      type: "click",
+      type: 'click',
       mode: EventModes.Fill,
       eventId: createEventId(),
       ...options,
@@ -82,13 +89,13 @@ export const useEventsManager = () => {
    * Draw the lines from where the user clicked
    *
    * @param options
-   * @param eventId
+   * @param replacePreviousDragEvent
    */
-  const onDragDraw = (options: OnDragDrawOptions, eventId = createEventId()) => {
+  const onDragDraw = (options: OnDragDrawOptions) => {
     const event: DragDrawEvent = {
-      type: "drag",
+      type: 'drag',
       mode: EventModes.Draw,
-      eventId,
+      eventId: createEventId(),
       ...options,
     };
 
@@ -98,16 +105,13 @@ export const useEventsManager = () => {
       return;
     }
 
-    const previousEventIndex = eventsPointer;
-    const previousEvent = events[previousEventIndex];
-
-    // if previousEventId == currentEventId, replace it
-    if (previousEvent.eventId === eventId) {
-      replaceEvent(previousEventIndex, event);
-      return;
+    const previousEvent = events[eventsPointer];
+    if (previousEvent.type === 'drag' && options.replacePreviousDragEvent) {
+      event.eventId = previousEvent.eventId;
+      replaceEvent(eventsPointer, event);
     }
 
-    // Else, if new event, push it directly
+    // Else, push it directly
     addNewEvent(event);
   };
 
@@ -119,7 +123,7 @@ export const useEventsManager = () => {
   const onClear = (color: Color) => {
     const event: ScreenClearEvent = {
       eventId: createEventId(),
-      type: "screen-clear",
+      type: 'screen-clear',
       color,
     };
     addNewEvent(event);
@@ -127,6 +131,7 @@ export const useEventsManager = () => {
 
   return {
     activeEvent,
+    previousEventIds,
     onClickDraw,
     onClickFill,
     onDragDraw,

@@ -1,8 +1,8 @@
 /**
  * @author Vighnesh Raut <rvighnes@amazon.com>
  */
-import { useReducer } from "react";
-import { BrushThickness, Color, EventModes } from "../utils/events";
+import { useReducer } from 'react';
+import { BrushThickness, Color, EventModes } from '../utils';
 
 export type ToolbarState = {
   mode: EventModes;

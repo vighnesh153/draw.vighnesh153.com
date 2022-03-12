@@ -4,8 +4,9 @@
 
 import React, { CSSProperties } from 'react';
 
+import { not } from '@vighnesh153/utils';
 import { BrushThickness, Color, EventModes } from '../../utils';
-import { RotateLeft, XMark } from '../../icons';
+import { RotateLeft, RotateRight, XMark } from '../../icons';
 import { ModeSelector } from './ModeSelector';
 import { ShowHide, useShowHide } from '../ShowHide';
 import { ColorPopover } from './ColorPopover';
@@ -15,9 +16,14 @@ export interface ToolbarProps {
   mode: EventModes;
   color: Color;
   brushThickness: BrushThickness;
+  isUndoAvailable: () => boolean;
+  isRedoAvailable: () => boolean;
   updateMode: (mode: EventModes) => void;
   updateColor: (color: Color) => void;
   updateBrushThickness: (brushThickness: BrushThickness) => void;
+  undo: () => void;
+  redo: () => void;
+  onClear: (color: Color) => void;
 }
 
 const ToolbarSeparator = () => <div style={{ height: 25, width: 2, backgroundColor: '#dedede' }} />;
@@ -26,9 +32,14 @@ export function Toolbar({
   mode: activeMode,
   color: activeColor,
   brushThickness: activeBrushThickness,
+  isUndoAvailable,
+  isRedoAvailable,
   updateMode,
   updateColor,
   updateBrushThickness,
+  undo,
+  redo,
+  onClear,
 }: ToolbarProps): JSX.Element {
   const { show: showColorPopover, toggleShow: toggleColorPopover } = useShowHide();
   const { show: showBrushThicknessPopover, toggleShow: toggleBrushThicknessPopover } = useShowHide();
@@ -122,14 +133,31 @@ export function Toolbar({
       </section>
       <ToolbarSeparator />
       <section style={baseSectionStyles}>
-        <div role="button" style={baseIconContainerStyles}>
+        <div
+          role="button"
+          style={{ ...baseIconButtonStyles, ...(isUndoAvailable() ? {} : baseIconButtonDisabledStyles) }}
+          aria-disabled={not(isUndoAvailable())}
+          onClick={undo}
+        >
           <RotateLeft style={baseIconStyles} />
         </div>
         <div style={baseFontStyles}>Undo</div>
       </section>
       <ToolbarSeparator />
       <section style={baseSectionStyles}>
-        <div role="button" style={baseIconContainerStyles}>
+        <div
+          role="button"
+          style={{ ...baseIconButtonStyles, ...(isRedoAvailable() ? {} : baseIconButtonDisabledStyles) }}
+          aria-disabled={not(isRedoAvailable())}
+          onClick={redo}
+        >
+          <RotateRight style={baseIconStyles} />
+        </div>
+        <div style={baseFontStyles}>Redo</div>
+      </section>
+      <ToolbarSeparator />
+      <section style={baseSectionStyles}>
+        <div role="button" style={baseIconButtonStyles} onClick={() => onClear(Color.White)}>
           <XMark style={baseIconStyles} />
         </div>
         <div style={baseFontStyles}>Clear</div>
@@ -150,16 +178,21 @@ const baseSectionStyles: CSSProperties = {
 const baseIconStyles: CSSProperties = {
   width: 20,
   height: 20,
-  cursor: 'pointer',
   backgroundColor: 'hsl(0, 0%, 100%)',
 };
 
-const baseIconContainerStyles: CSSProperties = {
+const baseIconButtonStyles: CSSProperties = {
   padding: 5,
   border: '3px solid',
   borderRadius: '50%',
   backgroundColor: 'transparent',
   borderColor: Color.Gray,
+  cursor: 'pointer',
+};
+
+const baseIconButtonDisabledStyles: CSSProperties = {
+  opacity: 0.3,
+  cursor: 'not-allowed',
 };
 
 const baseFontStyles: CSSProperties = { fontSize: '0.875rem', fontWeight: 'bold' };
