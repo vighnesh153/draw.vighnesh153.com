@@ -9,7 +9,7 @@ import { Color, DrawEvents } from '../utils';
 
 export interface CanvasHistoryState {
   events: DrawEvents[];
-  currentEventPointer: number | null;
+  currentEventPointer: number;
 }
 
 const reducer = (state: CanvasHistoryState, updates: Partial<CanvasHistoryState>): CanvasHistoryState => {
@@ -27,25 +27,26 @@ export interface CanvasHistoryProps {
 export const useCanvasHistory = (props: CanvasHistoryProps) => {
   const [{ events, currentEventPointer }, setState] = useReducer(reducer, {
     events: [{ type: 'clear', color: Color.White }],
-    currentEventPointer: null,
+    currentEventPointer: 0,
   });
+  console.log(currentEventPointer, JSON.stringify(events.map((e) => `${e.type}`)));
 
   // Hos no history
-  const isUndoAvailable = () => (currentEventPointer ?? 0) > 0;
+  const isUndoAvailable = () => currentEventPointer > 0;
 
   // Has at least 1 event to go forward to
-  const isRedoAvailable = () => (currentEventPointer ?? 0) < events.length - 1;
+  const isRedoAvailable = () => currentEventPointer < events.length - 1;
 
   // Undo changes
   const undo = () => {
     if (not(isUndoAvailable())) return;
 
-    let previousEventPointer = currentEventPointer! - 1;
+    let previousEventPointer = currentEventPointer - 1;
     let previousEvent = events[previousEventPointer];
 
     // As, at the end of every drag, we add a click event,
     // drag-event can never be a stopping point for the eventPointer
-    while (previousEvent.type !== 'line') {
+    while (previousEvent.type === 'line') {
       previousEventPointer -= 1;
       previousEvent = events[previousEventPointer];
     }
@@ -62,7 +63,7 @@ export const useCanvasHistory = (props: CanvasHistoryProps) => {
   const redo = () => {
     if (not(isRedoAvailable())) return;
 
-    let nextEventPointer = currentEventPointer! + 1;
+    let nextEventPointer = currentEventPointer + 1;
     let nextEvent = events[nextEventPointer];
 
     const newEvents: DrawEvents[] = [];
@@ -80,10 +81,10 @@ export const useCanvasHistory = (props: CanvasHistoryProps) => {
 
   // Adds new events: "git push --force" strategy
   const triggerEvents = (...newEvents: DrawEvents[]) => {
-    const previousEvents = events.slice(0, (currentEventPointer ?? -1) + 1);
+    const previousEvents = events.slice(0, currentEventPointer + 1);
     const combinedEvents = [...previousEvents, ...newEvents];
     setState({
-      currentEventPointer: (currentEventPointer ?? -1) + newEvents.length,
+      currentEventPointer: currentEventPointer + newEvents.length,
       events: combinedEvents,
     });
     props.addNew(combinedEvents);
