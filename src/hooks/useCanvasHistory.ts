@@ -29,7 +29,6 @@ export const useCanvasHistory = (props: CanvasHistoryProps) => {
     events: [{ type: 'clear', color: Color.White }],
     currentEventPointer: 0,
   });
-  console.log(currentEventPointer, JSON.stringify(events.map((e) => `${e.type}`)));
 
   // Hos no history
   const isUndoAvailable = () => currentEventPointer > 0;

@@ -41,15 +41,20 @@ export class CanvasHelper {
     this.reset();
   }
 
-  reset() {
+  reset = () => {
     this.canvasContext.setTransform(1, 0, 0, 1, 0, 0);
-  }
+  };
 
   getBoundingClientRect = () => {
     return this.canvas.getBoundingClientRect();
   };
 
-  drawLine(x1: number, y1: number, x2: number, y2: number, lineWidth: number, color: string) {
+  drawFilledRect = (x: number, y: number, width: number, height: number, color: string) => {
+    this.canvasContext.fillStyle = color;
+    this.canvasContext.fillRect(x, y, width, height);
+  };
+
+  drawLine = (x1: number, y1: number, x2: number, y2: number, lineWidth: number, color: string) => {
     this.canvasContext.save();
     this.canvasContext.beginPath();
     this.canvasContext.lineWidth = lineWidth;
@@ -58,7 +63,7 @@ export class CanvasHelper {
     this.canvasContext.lineTo(x2, y2);
     this.canvasContext.stroke();
     this.canvasContext.restore();
-  }
+  };
 
   drawFilledCircle = (centerX: number, centerY: number, radius: number, color: string) => {
     this.canvasContext.beginPath();
