@@ -30,7 +30,12 @@ export class CanvasHelper {
     canvas.width = width * scale;
     canvas.height = height * scale;
 
-    this.canvasContext = this.canvas.getContext('2d')!;
+    const canvasContext = this.canvas.getContext('2d');
+    if (canvasContext === null) {
+      throw new Error('CanvasContext is null. Check why that is happening.');
+    }
+
+    this.canvasContext = canvasContext;
     const dpr = window.devicePixelRatio;
     this.canvasContext.scale(dpr, dpr);
     this.reset();
