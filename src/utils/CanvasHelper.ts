@@ -30,7 +30,7 @@ export class CanvasHelper {
     canvas.width = width * scale;
     canvas.height = height * scale;
 
-    this.canvasContext = this.canvas.getContext("2d")!;
+    this.canvasContext = this.canvas.getContext('2d')!;
     const dpr = window.devicePixelRatio;
     this.canvasContext.scale(dpr, dpr);
     this.reset();
@@ -44,14 +44,7 @@ export class CanvasHelper {
     return this.canvas.getBoundingClientRect();
   };
 
-  drawLine(
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
-    lineWidth: number,
-    color: string
-  ) {
+  drawLine(x1: number, y1: number, x2: number, y2: number, lineWidth: number, color: string) {
     this.canvasContext.save();
     this.canvasContext.beginPath();
     this.canvasContext.lineWidth = lineWidth;
@@ -62,12 +55,7 @@ export class CanvasHelper {
     this.canvasContext.restore();
   }
 
-  drawFilledCircle = (
-    centerX: number,
-    centerY: number,
-    radius: number,
-    color: string
-  ) => {
+  drawFilledCircle = (centerX: number, centerY: number, radius: number, color: string) => {
     this.canvasContext.beginPath();
     this.canvasContext.fillStyle = color;
     this.canvasContext.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);

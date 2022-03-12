@@ -3,7 +3,7 @@
  */
 
 import React, { MouseEventHandler, useCallback, useEffect, useRef } from 'react';
-import { CanvasHelper } from './CanvasHelper';
+import { CanvasHelper } from '../utils';
 
 type State = 'idle' | 'mousedown' | 'drag';
 type Coordinate = { x: number; y: number };

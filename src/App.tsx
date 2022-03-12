@@ -4,8 +4,7 @@
 
 import React from 'react';
 
-import { Canvas } from './Canvas';
-import { Toolbar } from './components';
+import { Canvas, Toolbar } from './components';
 import { useToolbar } from './hooks';
 
 export function App(): JSX.Element {
