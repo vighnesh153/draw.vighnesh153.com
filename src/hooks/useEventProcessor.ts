@@ -3,7 +3,7 @@
  */
 
 import { RefObject, useEffect } from 'react';
-import { not } from '@vighnesh153/utils';
+import { not, Queue } from '@vighnesh153/utils';
 
 import { CanvasHelper, colorToRgba, RGBA } from '../utils';
 import { useProcessingQueueRef } from '../contexts';
@@ -70,47 +70,57 @@ export const useEventProcessor = ({ canvasRef }: UseEventProcessorProps) => {
               const g = canvasPixelData.data[gIndex];
               const b = canvasPixelData.data[bIndex];
               const a = canvasPixelData.data[aIndex];
-              return `rgba(${r}, ${g}, ${b}, ${a / 255})`;
+              return { r, g, b, a };
+            };
+
+            const areColorsEqual = (color1: RGBA, color2: RGBA) => {
+              if (color1.r !== color2.r) return false;
+              if (color1.g !== color2.g) return false;
+              if (color1.b !== color2.b) return false;
+              if (color1.a !== color2.a) return false;
+              return true;
             };
 
             // Color of the starting pixel
             const initialColor = getColorForPixel(c.x, c.y);
+            const newColor = colorToRgba(color);
+
+            // In the pixel data, "alpha" needs to be between (0 and 255)
+            newColor.a *= 255;
 
             // set of all the nodes that are already visited
-            const visitedNodes = new Set<string>();
+            const visitedNodes: Record<number, Record<number, boolean>> = {};
+            const pixelQueue = new Queue([c.x, c.y]);
 
             // Implementation of BFS algorithm for filling colors in
             // the region
-            const colorFillAlgo = (x: number, y: number, newColor: RGBA) => {
-              const pixelIndices = getColorIndicesForPixel(x, y);
+            while (not(pixelQueue.isEmpty)) {
+              const [x, y] = pixelQueue.popLeft()!;
+
+              const { rIndex, gIndex, bIndex, aIndex } = getColorIndicesForPixel(x, y);
 
               // if index out of bounds, return
-              if (x < 0 || x >= canvasCtx!.width || y < 0 || y >= canvasCtx!.height) return;
+              if (x < 0 || x >= canvasCtx!.width || y < 0 || y >= canvasCtx!.height) continue;
 
               // if color is not same as initial color, return
-              if (getColorForPixel(x, y) !== initialColor) return;
+              if (not(areColorsEqual(getColorForPixel(x, y), initialColor))) continue;
 
               // if already visited, return
-              if (visitedNodes.has(`${[x, y]}`)) return;
+              if (visitedNodes[x]?.[y]) continue;
 
               // Add to visited nodes
-              visitedNodes.add(`${[x, y]}`);
+              visitedNodes[x] = visitedNodes[x] || ({} as Record<number, boolean>);
+              visitedNodes[x][y] = true;
 
               // update the color in pixel data
-              canvasPixelData.data[pixelIndices.rIndex] = newColor.r;
-              canvasPixelData.data[pixelIndices.gIndex] = newColor.g;
-              canvasPixelData.data[pixelIndices.bIndex] = newColor.b;
-              canvasPixelData.data[pixelIndices.aIndex] = Math.floor(newColor.a * 255);
+              canvasPixelData.data[rIndex] = newColor.r;
+              canvasPixelData.data[gIndex] = newColor.g;
+              canvasPixelData.data[bIndex] = newColor.b;
+              canvasPixelData.data[aIndex] = newColor.a;
 
               // fill the surrounding nodes
-              colorFillAlgo(x + 1, y, newColor);
-              colorFillAlgo(x - 1, y, newColor);
-              colorFillAlgo(x, y + 1, newColor);
-              colorFillAlgo(x, y - 1, newColor);
-            };
-
-            // start the algorithm from starting point
-            colorFillAlgo(c.x, c.y, colorToRgba(color));
+              pixelQueue.pushRight([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+            }
 
             // update the canvas with the new color values
             canvasCtx!.putImageData(canvasPixelData, 0, 0);
