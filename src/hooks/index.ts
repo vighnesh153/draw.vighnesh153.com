@@ -3,5 +3,4 @@
  */
 
 export * from './useCanvasHistory';
-export * from './useEventsManager';
 export * from './useEventProcessor';

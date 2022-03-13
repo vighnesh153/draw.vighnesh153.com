@@ -4,12 +4,14 @@
 
 import React from 'react';
 
-import { ProcessingQueueProvider, ToolbarProvider } from '../contexts';
+import { ProcessingQueueProvider, ToolbarProvider, EventsManagerProvider } from '../contexts';
 
 export function AppProviders({ children }: { children: JSX.Element }): JSX.Element {
   return (
     <ProcessingQueueProvider>
-      <ToolbarProvider>{children}</ToolbarProvider>
+      <ToolbarProvider>
+        <EventsManagerProvider>{children}</EventsManagerProvider>
+      </ToolbarProvider>
     </ProcessingQueueProvider>
   );
 }

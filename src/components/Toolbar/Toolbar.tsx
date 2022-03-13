@@ -3,25 +3,21 @@
  */
 
 import React, { CSSProperties } from 'react';
-
 import { not } from '@vighnesh153/utils';
-import { Color } from '../../utils';
-import { RotateLeft, RotateRight, XMark } from '../../icons';
+
 import { ModeSelector } from './ModeSelector';
 import { ColorPopover } from './ColorPopover';
 import { BrushThicknessPopover } from './BrushThicknessPopover';
 
-export interface ToolbarProps {
-  isUndoAvailable: () => boolean;
-  isRedoAvailable: () => boolean;
-  undo: () => void;
-  redo: () => void;
-  onClear: () => void;
-}
+import { Color } from '../../utils';
+import { RotateLeft, RotateRight, XMark } from '../../icons';
+import { useEventsManager } from '../../contexts';
 
 const ToolbarSeparator = () => <div style={{ height: 25, width: 2, backgroundColor: '#dedede' }} />;
 
-export function Toolbar({ isUndoAvailable, isRedoAvailable, undo, redo, onClear }: ToolbarProps): JSX.Element {
+export function Toolbar(): JSX.Element {
+  const { undo, redo, isUndoAvailable, isRedoAvailable, triggerEvents, buildClearScreenEvent } = useEventsManager();
+
   return (
     <section
       style={{
@@ -77,7 +73,11 @@ export function Toolbar({ isUndoAvailable, isRedoAvailable, undo, redo, onClear 
       </section>
       <ToolbarSeparator />
       <section style={baseSectionStyles}>
-        <div role="button" style={baseIconButtonStyles} onClick={onClear}>
+        <div
+          role="button"
+          style={baseIconButtonStyles}
+          onClick={() => triggerEvents(buildClearScreenEvent({ color: Color.White }))}
+        >
           <XMark style={baseIconStyles} />
         </div>
         <div style={baseFontStyles}>Clear</div>

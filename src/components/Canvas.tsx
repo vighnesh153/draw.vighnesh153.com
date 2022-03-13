@@ -2,25 +2,18 @@
  * @author Vighnesh Raut <rvighnes@amazon.com>
  */
 
-import React, { MouseEventHandler, MutableRefObject, Ref, useEffect, useRef } from 'react';
+import React, { MouseEventHandler, useEffect, useRef } from 'react';
 
-import { CanvasHelper, Coordinates, DrawEvents, DrawLineEvent, DrawPointEvent, EventMode, FillEvent } from '../utils';
-import { useToolbar } from '../contexts';
+import { CanvasHelper, Coordinates, EventMode } from '../utils';
+import { useEventsManager, useToolbar } from '../contexts';
 import { useEventProcessor } from '../hooks';
 
 type State = 'idle' | 'pressed' | 'drag';
 
-export interface CanvasProps {
-  canvasRef: Ref<HTMLCanvasElement>;
-  buildDrawLineEvent: (options: Omit<DrawLineEvent, 'type'>) => DrawLineEvent;
-  buildFillEvent: (options: Omit<FillEvent, 'type'>) => FillEvent;
-  buildDrawPointEvent: (options: Omit<DrawPointEvent, 'type'>) => DrawPointEvent;
-  triggerEvents: (...events: DrawEvents[]) => void;
-}
-
-export function Canvas({ canvasRef, triggerEvents, ...builders }: CanvasProps): JSX.Element {
+export function Canvas(): JSX.Element {
+  const { buildDrawPointEvent, buildFillEvent, buildDrawLineEvent, triggerEvents } = useEventsManager();
   const { mode, color, brushThickness } = useToolbar();
-  const internalCanvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<State>('idle');
   const canvasHelperRef = useRef<CanvasHelper>();
   const previousCoordinatesRef = useRef<Coordinates | null>(null);
@@ -56,7 +49,7 @@ export function Canvas({ canvasRef, triggerEvents, ...builders }: CanvasProps): 
     stateRef.current = 'drag';
 
     // trigger event
-    const drawLineEvent = builders.buildDrawLineEvent({
+    const drawLineEvent = buildDrawLineEvent({
       color,
       brushThickness,
       coordinate1: previousCoordinatesRef.current!,
@@ -80,9 +73,9 @@ export function Canvas({ canvasRef, triggerEvents, ...builders }: CanvasProps): 
     stateRef.current = 'idle';
     previousCoordinatesRef.current = null;
 
-    const fillEvent = builders.buildFillEvent({ color, coordinates });
-    const drawPointEvent = builders.buildDrawPointEvent({ color, coordinates, brushThickness });
-    const drawLineEvent = builders.buildDrawLineEvent({
+    const fillEvent = buildFillEvent({ color, coordinates });
+    const drawPointEvent = buildDrawPointEvent({ color, coordinates, brushThickness });
+    const drawLineEvent = buildDrawLineEvent({
       color,
       brushThickness,
       coordinate1: previousCoordinates,
@@ -108,20 +101,12 @@ export function Canvas({ canvasRef, triggerEvents, ...builders }: CanvasProps): 
   };
 
   useEffect(() => {
-    canvasHelperRef.current = new CanvasHelper(internalCanvasRef.current!);
+    canvasHelperRef.current = new CanvasHelper(canvasRef.current!);
   }, []);
 
   return (
     <canvas
-      ref={(element) => {
-        (internalCanvasRef as MutableRefObject<HTMLCanvasElement>).current = element!;
-        if (typeof canvasRef === 'function') {
-          canvasRef(element);
-        } else {
-          // @ts-ignore
-          canvasRef!.current = element!;
-        }
-      }}
+      ref={canvasRef}
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
       onMouseUp={onMouseUp}
