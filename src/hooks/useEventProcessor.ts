@@ -2,24 +2,24 @@
  * @author Vighnesh Raut <rvighnes@amazon.com>
  */
 
-import { useEffect } from 'react';
+import { RefObject, useEffect } from 'react';
 import { not } from '@vighnesh153/utils';
 
 import { CanvasHelper, colorToRgba, RGBA } from '../utils';
 import { useProcessingQueueRef } from '../contexts';
 
 export interface UseEventProcessorProps {
-  canvasHelper: React.MutableRefObject<CanvasHelper | undefined>;
+  canvasRef: RefObject<HTMLCanvasElement>;
 }
 
-export const useEventProcessor = ({ canvasHelper }: UseEventProcessorProps) => {
+export const useEventProcessor = ({ canvasRef }: UseEventProcessorProps) => {
   const processingQueueRef = useProcessingQueueRef();
 
   useEffect(() => {
     let mounted = true;
+    const canvasCtx = new CanvasHelper(canvasRef.current!);
 
     const processEventsFromQueue = () => {
-      const canvasCtx = canvasHelper.current;
       const queue = processingQueueRef.current;
 
       requestAnimationFrame(processEventsFromQueue);
@@ -78,14 +78,11 @@ export const useEventProcessor = ({ canvasHelper }: UseEventProcessorProps) => {
 
             // set of all the nodes that are already visited
             const visitedNodes = new Set<string>();
-            console.log('reached here');
 
             // Implementation of BFS algorithm for filling colors in
             // the region
             const colorFillAlgo = (x: number, y: number, newColor: RGBA) => {
               const pixelIndices = getColorIndicesForPixel(x, y);
-
-              console.log('filling', x, y);
 
               // if index out of bounds, return
               if (x < 0 || x >= canvasCtx!.width || y < 0 || y >= canvasCtx!.height) return;

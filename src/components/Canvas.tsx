@@ -2,9 +2,9 @@
  * @author Vighnesh Raut <rvighnes@amazon.com>
  */
 
-import React, { MouseEventHandler, useEffect, useRef } from 'react';
+import React, { MouseEventHandler, useRef } from 'react';
 
-import { CanvasHelper, Coordinates, EventMode } from '../utils';
+import { Coordinates, EventMode } from '../utils';
 import { useEventsManager, useToolbar } from '../contexts';
 import { useEventProcessor } from '../hooks';
 
@@ -15,13 +15,12 @@ export function Canvas(): JSX.Element {
   const { mode, color, brushThickness } = useToolbar();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<State>('idle');
-  const canvasHelperRef = useRef<CanvasHelper>();
   const previousCoordinatesRef = useRef<Coordinates | null>(null);
 
   /**
    * Processes the events ❤️ 😇 🥺
    */
-  useEventProcessor({ canvasHelper: canvasHelperRef });
+  useEventProcessor({ canvasRef });
 
   /**
    * Handles mousedown event's interaction with the current state
@@ -99,10 +98,6 @@ export function Canvas(): JSX.Element {
 
     throw new Error('We should never reach here.');
   };
-
-  useEffect(() => {
-    canvasHelperRef.current = new CanvasHelper(canvasRef.current!);
-  }, []);
 
   return (
     <canvas
