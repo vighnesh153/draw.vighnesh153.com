@@ -3,6 +3,7 @@
  */
 
 import { MouseEventHandler, useRef } from 'react';
+
 import { Coordinates, EventMode } from '../utils';
 import { useEventsManager, useToolbar } from '../contexts';
 
