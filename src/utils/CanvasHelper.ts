@@ -14,10 +14,11 @@ export class CanvasHelper {
     return this.canvas.height;
   }
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    { width = window.innerWidth, height = window.innerHeight }: { width?: number; height?: number } = {}
+  ) {
     this.canvas = canvas;
-    const width = window.innerWidth;
-    const height = window.innerHeight;
 
     // Set display size (css pixels)
     canvas.style.width = `${width}px`;
@@ -34,6 +35,9 @@ export class CanvasHelper {
     if (canvasContext === null) {
       throw new Error('CanvasContext is null. Check why that is happening.');
     }
+
+    // Disable image smoothing (shows wrong color during fill operation with putImageData)
+    canvasContext.imageSmoothingEnabled = false;
 
     this.canvasContext = canvasContext;
     const dpr = window.devicePixelRatio;

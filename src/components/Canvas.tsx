@@ -8,7 +8,7 @@ import { useCanvasMouseEventsHandlers, useEventProcessor } from '../hooks';
 
 export function Canvas(): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { onMouseDown, onMouseMove, onMouseUp } = useCanvasMouseEventsHandlers();
+  const { onMouseDown, onMouseMove, onMouseUp } = useCanvasMouseEventsHandlers({ canvasRef });
 
   /**
    * Processes the events ❤️ 😇 🥺
@@ -21,7 +21,11 @@ export function Canvas(): JSX.Element {
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
       onMouseUp={onMouseUp}
-      style={{ border: '10px solid red', width: '100%', height: '100%' }}
+      style={{
+        position: 'relative',
+        display: 'block',
+        border: '10px solid black',
+      }}
     >
       Your browser doesn't seem to support canvas. Please update your browser or try opening in a different browser
     </canvas>

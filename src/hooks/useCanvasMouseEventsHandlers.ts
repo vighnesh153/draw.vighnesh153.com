@@ -2,14 +2,26 @@
  * @author Vighnesh Raut <rvighnes@amazon.com>
  */
 
-import { MouseEventHandler, useRef } from 'react';
+import { MouseEventHandler, RefObject, useRef } from 'react';
 
 import { Coordinates, EventMode } from '../utils';
 import { useEventsManager, useToolbar } from '../contexts';
 
 type State = 'idle' | 'pressed' | 'drag';
 
-export const useCanvasMouseEventsHandlers = () => {
+export interface UseCanvasMouseEventsHandlers {
+  canvasRef: RefObject<HTMLCanvasElement>;
+}
+
+const getMouseCoordinates = (
+  e: React.MouseEvent<HTMLCanvasElement, MouseEvent>,
+  canvas: HTMLCanvasElement
+): Coordinates => {
+  const rect = canvas.getBoundingClientRect();
+  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+};
+
+export const useCanvasMouseEventsHandlers = ({ canvasRef }: UseCanvasMouseEventsHandlers) => {
   const { buildDrawPointEvent, buildFillEvent, buildDrawLineEvent, triggerEvents } = useEventsManager();
   const { mode, color, brushThickness } = useToolbar();
   const stateRef = useRef<State>('idle');
@@ -19,7 +31,7 @@ export const useCanvasMouseEventsHandlers = () => {
    * Handles mousedown event's interaction with the current state
    */
   const onMouseDown: MouseEventHandler<HTMLCanvasElement> = (e) => {
-    const coordinates = { x: e.clientX, y: e.clientY };
+    const coordinates = getMouseCoordinates(e, canvasRef.current!);
     const previousState = stateRef.current;
 
     if (previousState !== 'idle') return;
@@ -32,7 +44,7 @@ export const useCanvasMouseEventsHandlers = () => {
    * Handles mousemove event's interaction with the current state
    */
   const onMouseMove: MouseEventHandler<HTMLCanvasElement> = (e) => {
-    const currentCoordinates = { x: e.clientX, y: e.clientY };
+    const currentCoordinates = getMouseCoordinates(e, canvasRef.current!);
     const previousState = stateRef.current;
 
     if (previousState === 'idle') return;
@@ -59,7 +71,7 @@ export const useCanvasMouseEventsHandlers = () => {
    * Handles mouseup event's interaction with the current state
    */
   const onMouseUp: MouseEventHandler<HTMLCanvasElement> = (e) => {
-    const coordinates = { x: e.clientX, y: e.clientY };
+    const coordinates = getMouseCoordinates(e, canvasRef.current!);
     const previousCoordinates = previousCoordinatesRef.current!;
     const previousState = stateRef.current;
     stateRef.current = 'idle';

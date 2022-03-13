@@ -36,5 +36,5 @@ export const colorToRgba = (color: string) => {
   const converted = toRgba(color);
   if (!converted) throw new Error('Failed to parse');
   const [r, g, b, a] = converted;
-  return { r, g, b, a };
+  return { r: Math.floor(r), g: Math.floor(g), b: Math.floor(b), a };
 };

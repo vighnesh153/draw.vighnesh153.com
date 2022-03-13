@@ -26,7 +26,14 @@ export function ColorPopover({ style, baseFontStyles }: ColorPopoverProps): JSX.
     <>
       <div
         role="button"
-        style={{ width: 35, height: 35, backgroundColor: activeColor, borderRadius: '50%', cursor: 'pointer' }}
+        style={{
+          width: 35,
+          height: 35,
+          backgroundColor: activeColor,
+          borderRadius: '50%',
+          cursor: 'pointer',
+          border: '1px solid #dedede',
+        }}
         onClick={() => toggleShow()}
       />
       <div style={baseFontStyles}>Color</div>

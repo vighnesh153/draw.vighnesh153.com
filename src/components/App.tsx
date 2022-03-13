@@ -9,7 +9,16 @@ import { Toolbar } from './Toolbar';
 
 export function App(): JSX.Element {
   return (
-    <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
+    <div
+      style={{
+        position: 'relative',
+        width: '100vw',
+        height: '100vh',
+        display: 'grid',
+        placeItems: 'center',
+        padding: '1rem',
+      }}
+    >
       <Canvas />
       <Toolbar />
     </div>
