@@ -86,7 +86,7 @@ export const useCanvasHistory = (props: CanvasHistoryProps) => {
       currentEventPointer: currentEventPointer + newEvents.length,
       events: combinedEvents,
     });
-    props.addNew(combinedEvents);
+    props.addNew(newEvents);
   };
 
   return { isUndoAvailable, isRedoAvailable, undo, redo, triggerEvents };

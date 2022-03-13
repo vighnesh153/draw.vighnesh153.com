@@ -16,7 +16,7 @@ export interface ToolbarProps {
   isRedoAvailable: () => boolean;
   undo: () => void;
   redo: () => void;
-  onClear: (color: Color) => void;
+  onClear: () => void;
 }
 
 const ToolbarSeparator = () => <div style={{ height: 25, width: 2, backgroundColor: '#dedede' }} />;
@@ -77,7 +77,7 @@ export function Toolbar({ isUndoAvailable, isRedoAvailable, undo, redo, onClear 
       </section>
       <ToolbarSeparator />
       <section style={baseSectionStyles}>
-        <div role="button" style={baseIconButtonStyles} onClick={() => onClear(Color.White)}>
+        <div role="button" style={baseIconButtonStyles} onClick={onClear}>
           <XMark style={baseIconStyles} />
         </div>
         <div style={baseFontStyles}>Clear</div>

@@ -49,6 +49,14 @@ export class CanvasHelper {
     return this.canvas.getBoundingClientRect();
   };
 
+  getImageData = (x: number, y: number, w: number, h: number, settings?: ImageDataSettings) => {
+    return this.canvasContext.getImageData(x, y, w, h, settings);
+  };
+
+  putImageData = (imageData: ImageData, dx: number, dy: number) => {
+    return this.canvasContext.putImageData(imageData, dx, dy);
+  };
+
   drawFilledRect = (x: number, y: number, width: number, height: number, color: string) => {
     this.canvasContext.fillStyle = color;
     this.canvasContext.fillRect(x, y, width, height);

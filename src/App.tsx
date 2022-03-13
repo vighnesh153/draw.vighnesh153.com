@@ -11,10 +11,10 @@ import { Color } from './utils';
 export function App(): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const {
-    isUndoAvailable,
     undo,
-    isRedoAvailable,
     redo,
+    isUndoAvailable,
+    isRedoAvailable,
     buildClearScreenEvent,
     buildDrawLineEvent,
     buildFillEvent,
@@ -36,7 +36,7 @@ export function App(): JSX.Element {
         isRedoAvailable={isRedoAvailable}
         undo={undo}
         redo={redo}
-        onClear={() => buildClearScreenEvent({ color: Color.White })}
+        onClear={() => triggerEvents(buildClearScreenEvent({ color: Color.White }))}
       />
     </div>
   );
