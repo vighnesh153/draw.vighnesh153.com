@@ -6,6 +6,7 @@ import React from 'react';
 
 import { Canvas } from './Canvas';
 import { Toolbar } from './Toolbar';
+import { About } from './About';
 
 export function App(): JSX.Element {
   return (
@@ -14,13 +15,12 @@ export function App(): JSX.Element {
         position: 'relative',
         width: '100vw',
         height: '100vh',
-        display: 'grid',
-        placeItems: 'center',
-        padding: '1rem',
+        padding: '0 1rem',
       }}
     >
-      <Canvas />
+      <About />
       <Toolbar />
+      <Canvas />
     </div>
   );
 }

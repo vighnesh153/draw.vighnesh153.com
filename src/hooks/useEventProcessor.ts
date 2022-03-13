@@ -87,7 +87,6 @@ export const useEventProcessor = ({ canvasRef }: UseEventProcessorProps) => {
             // Color of the starting pixel
             const initialColor = getColorForPixel(c.x, c.y);
             const newColor = colorToRgba(color);
-            console.log(color, newColor);
 
             // In the pixel data, "alpha" needs to be between (0 and 255)
             newColor.a *= 255;
@@ -142,5 +141,5 @@ export const useEventProcessor = ({ canvasRef }: UseEventProcessorProps) => {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [canvasRef, processingQueueRef]);
 };

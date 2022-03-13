@@ -21,14 +21,10 @@ export function Toolbar(): JSX.Element {
   return (
     <section
       style={{
-        position: 'absolute',
         width: `fit-content`,
         height: 70,
-        margin: '0 auto',
+        margin: '1rem auto 0',
         padding: '0 1rem',
-        left: 0,
-        right: 0,
-        top: 0,
         backgroundColor: '#fafafa',
         border: '1px solid #dedede',
         borderRadius: 5,
@@ -127,4 +123,5 @@ const basePopoverStyles: CSSProperties = {
   border: '1px solid #dedede',
   borderRadius: 5,
   lineHeight: 1,
+  zIndex: 2,
 };

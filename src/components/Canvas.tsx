@@ -24,6 +24,7 @@ export function Canvas(): JSX.Element {
       style={{
         position: 'relative',
         display: 'block',
+        margin: 'auto',
         border: '10px solid black',
       }}
     >
