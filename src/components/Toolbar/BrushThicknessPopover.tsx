@@ -5,17 +5,28 @@
 import React, { CSSProperties } from 'react';
 
 import { ShowHide, useShowHide } from '../ShowHide';
-import { BrushThickness } from '../../utils';
+import { BrushThickness, EventMode } from '../../utils';
 import { useToolbar } from '../../contexts';
 
 export interface BrushThicknessPopoverProps {
   style?: CSSProperties;
   baseFontStyles?: CSSProperties;
+  baseIconButtonDisabledStyles?: CSSProperties;
 }
 
-export function BrushThicknessPopover({ style, baseFontStyles }: BrushThicknessPopoverProps): JSX.Element {
-  const { color: activeColor, brushThickness: activeBrushThickness, updateBrushThickness } = useToolbar();
+export function BrushThicknessPopover({
+  style,
+  baseFontStyles,
+  baseIconButtonDisabledStyles,
+}: BrushThicknessPopoverProps): JSX.Element {
+  const {
+    color: activeColor,
+    mode: activeMode,
+    brushThickness: activeBrushThickness,
+    updateBrushThickness,
+  } = useToolbar();
   const { show, toggleShow } = useShowHide();
+  const isDisabled = activeMode !== EventMode.Draw;
 
   const handleBrushThicknessChange = (thickness: BrushThickness) => {
     updateBrushThickness(thickness);
@@ -35,8 +46,10 @@ export function BrushThicknessPopover({ style, baseFontStyles }: BrushThicknessP
           display: 'grid',
           placeItems: 'center',
           cursor: 'pointer',
+          ...(isDisabled ? baseIconButtonDisabledStyles : {}),
         }}
         onClick={() => toggleShow()}
+        aria-disabled={isDisabled}
       >
         <div
           style={{

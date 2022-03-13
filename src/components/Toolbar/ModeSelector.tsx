@@ -15,7 +15,7 @@ export interface ModeSelectorProps {
 }
 
 export function ModeSelector({ style, iconStyle, fontStyle }: ModeSelectorProps): JSX.Element {
-  const highlightColor = Color.Orange;
+  const highlightColor = Color.DarkBlue;
   const { mode: activeMode, updateMode } = useToolbar();
 
   const handleUpdateMode: React.ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -42,6 +42,8 @@ export function ModeSelector({ style, iconStyle, fontStyle }: ModeSelectorProps)
                 backgroundColor: activeMode === mode ? highlightColor : 'transparent',
                 borderColor: activeMode === mode ? highlightColor : Color.Gray,
                 cursor: 'pointer',
+                outline: activeMode === mode ? `2px solid ${highlightColor}` : 'none',
+                outlineOffset: 2,
               }}
             >
               <Component

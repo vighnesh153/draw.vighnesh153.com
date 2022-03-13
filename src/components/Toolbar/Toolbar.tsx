@@ -41,7 +41,11 @@ export function Toolbar(): JSX.Element {
       </section>
       <ToolbarSeparator />
       <section style={baseSectionStyles}>
-        <BrushThicknessPopover style={basePopoverStyles} baseFontStyles={baseFontStyles} />
+        <BrushThicknessPopover
+          style={basePopoverStyles}
+          baseFontStyles={baseFontStyles}
+          baseIconButtonDisabledStyles={baseIconButtonDisabledStyles}
+        />
       </section>
       <ToolbarSeparator />
       <section style={baseSectionStyles}>
